@@ -22,12 +22,12 @@ pub struct PendulumSystem {
 impl PendulumSystem {
     pub fn new(height: f64, mass: f64, gravity: f64, drag: f64, length: f64, attractors: Vec<Attractor>) -> PendulumSystem {
         PendulumSystem {
-            height: height,
-            mass: mass,
-            gravity: gravity,
-            drag: drag,
-            length: length,
-            attractors: attractors,
+            height,
+            mass,
+            gravity,
+            drag,
+            length,
+            attractors,
             length_squared: length * length,
             gravity_over_length: gravity / length
         }
@@ -35,7 +35,7 @@ impl PendulumSystem {
 }
 
 impl DifferentialSystem for PendulumSystem {
-    fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64) -> () {
+    fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64) {
         let _ = t; // system not dependent on t
         let x_squared = x[0] * x[0];
         let y_squared = x[1] * x[1];

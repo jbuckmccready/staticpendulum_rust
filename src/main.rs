@@ -20,12 +20,11 @@ pub struct IntegrationResult {
 #[inline]
 fn integrate_point<T: Integrator<PendulumSystem>>(integrator: &T, pendulum_system: &PendulumSystem, point: &mut [f64; 4]) -> IntegrationResult {
     fn is_near_attractor(attr_x: f64, attr_y: f64, curr_x: f64, curr_y: f64, tol: f64) -> bool {
-        return (attr_x - tol < curr_x) && (curr_x < attr_x + tol) &&
-                (attr_y  - tol < curr_y) && (curr_y < attr_y + tol);
+        (attr_x - tol < curr_x) && (curr_x < attr_x + tol) && (attr_y  - tol < curr_y) && (curr_y < attr_y + tol)
     }
 
     fn is_near_mid(curr_x: f64, curr_y: f64, tol: f64) -> bool {
-        return (-tol < curr_x) && (curr_x < tol) && (-tol < curr_y) && (curr_y < tol);
+        (-tol < curr_x) && (curr_x < tol) && (-tol < curr_y) && (curr_y < tol)
     }
 
     let pos_tol = 0.5;
@@ -40,7 +39,7 @@ fn integrate_point<T: Integrator<PendulumSystem>>(integrator: &T, pendulum_syste
     let mut step_count = 0u32;
     let mut near_attractor = false;
     let attractor_count = pendulum_system.attractors.len();
-    'outer: while trial_count < 1000 {
+    while trial_count < 1000 {
         step_count += integrator.do_step(&pendulum_system, &mut *point, &mut curr_time, &mut step_size) as u32;
         trial_count += 1;
         'inner: for i in 0..attractor_count {
@@ -50,7 +49,7 @@ fn integrate_point<T: Integrator<PendulumSystem>>(integrator: &T, pendulum_syste
             if near_attractor {
                 if current_attractor == i as i32 {
                     if curr_time - initial_time_found > time_tol {
-                        return IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count: step_count };
+                        return IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count };
                     }
                 } else {
                     current_attractor = i as i32;
@@ -63,7 +62,7 @@ fn integrate_point<T: Integrator<PendulumSystem>>(integrator: &T, pendulum_syste
         if !near_attractor && is_near_mid(point[0], point[1], mid_tol) {
             if current_attractor == -1 {
                 if curr_time - initial_time_found > time_tol {
-                    return IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count: step_count };
+                    return IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count };
                 }
             } else {
                 current_attractor = -1;
@@ -73,7 +72,7 @@ fn integrate_point<T: Integrator<PendulumSystem>>(integrator: &T, pendulum_syste
         }
         near_attractor = false;
     }
-    return IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count: step_count };
+    IntegrationResult { converge_result: current_attractor, converge_time: curr_time, step_count }
 }
 
 
@@ -85,8 +84,8 @@ fn main() {
         0.2,
         10.0,
         vec![
-            Attractor {x_position: -0.5, y_position: 0.86602540378, force_coefficient: 1.0},
-            Attractor {x_position: -0.5, y_position: -0.86602540378, force_coefficient: 1.0},
+            Attractor {x_position: -0.5, y_position: 0.866_025_403_78, force_coefficient: 1.0},
+            Attractor {x_position: -0.5, y_position: -0.866_025_403_78, force_coefficient: 1.0},
             Attractor {x_position: 1.0, y_position: 0.0, force_coefficient: 1.0}
         ]
     );
@@ -99,7 +98,7 @@ fn main() {
 
     println!("integrating {0} points", (2*dim)*(2*dim));
     let start = PreciseTime::now();
-    let mut points: Vec<[f64; 4]> = iproduct!(-dim..dim, -dim..dim).map(|(x, y)| { [(x as f64) * res, (y as f64) * res, 0.0, 0.0] }).collect();
+    let mut points: Vec<[f64; 4]> = iproduct!(-dim..dim, -dim..dim).map(|(x, y)| { [f64::from(x) * res, f64::from(y) * res, 0.0, 0.0] }).collect();
 
     let results: Vec<IntegrationResult> = points.par_iter_mut().map(|point| { integrate_point(&test_integrator, &test_sys, point) }).collect();
 
@@ -122,7 +121,7 @@ fn main() {
 
     let time = start.to(PreciseTime::now());
 
-    let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
+    let fout = &mut File::create(&Path::new("fractal.png")).unwrap();
 
     let _    = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 

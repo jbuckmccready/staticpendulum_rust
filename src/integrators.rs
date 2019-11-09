@@ -54,7 +54,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         const A61: f64 = 1631.0 / 55296.0;
         const A62: f64 = 175.0 / 512.0;
         const A63: f64 = 575.0 / 13824.0;
-        const A64: f64 = 44275.0 / 110592.0;
+        const A64: f64 = 44275.0 / 110_592.0;
         const A65: f64 = 253.0 / 4096.0;
 
         let mut temp_state = [0.0; 4];
@@ -115,6 +115,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         if max_error < 0.5 {
             *h = (*h * (0.9 * max_error.powf(-0.20)).min(5.0)).min(self.max_step_size);
         }
-        return 1;
+
+        1
     }
 }
