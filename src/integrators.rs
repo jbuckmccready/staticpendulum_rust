@@ -62,7 +62,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         let mut temp_state = [0.0; 4];
 
         let mut k1 = [0.0; 4];
-        system.evaluate(&x, &mut k1, *t); // fill k1
+        system.evaluate(x, &mut k1, *t); // fill k1
 
         izip!((*x).iter(), k1.iter(), &mut temp_state)
             .for_each(|(xi, k1i, ts)| *ts = xi + *h * A21 * k1i);

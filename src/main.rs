@@ -43,12 +43,8 @@ fn integrate_point<T: Integrator<PendulumSystem>>(
     let mut near_attractor = false;
     let attractor_count = pendulum_system.attractors.len();
     while trial_count < 1000 {
-        step_count += integrator.do_step(
-            &pendulum_system,
-            &mut *point,
-            &mut curr_time,
-            &mut step_size,
-        ) as u32;
+        step_count +=
+            integrator.do_step(pendulum_system, &mut *point, &mut curr_time, &mut step_size) as u32;
         trial_count += 1;
         'inner: for i in 0..attractor_count {
             near_attractor = is_near_attractor(

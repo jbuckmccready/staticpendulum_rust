@@ -1,11 +1,11 @@
 pub trait DifferentialSystem {
-    fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64) -> ();
+    fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64);
 }
 
 pub struct Attractor {
     pub x_position: f64,
     pub y_position: f64,
-    pub force_coefficient: f64
+    pub force_coefficient: f64,
 }
 
 pub struct PendulumSystem {
@@ -16,11 +16,18 @@ pub struct PendulumSystem {
     pub length: f64,
     pub attractors: Vec<Attractor>,
     length_squared: f64,
-    gravity_over_length: f64
+    gravity_over_length: f64,
 }
 
 impl PendulumSystem {
-    pub fn new(height: f64, mass: f64, gravity: f64, drag: f64, length: f64, attractors: Vec<Attractor>) -> PendulumSystem {
+    pub fn new(
+        height: f64,
+        mass: f64,
+        gravity: f64,
+        drag: f64,
+        length: f64,
+        attractors: Vec<Attractor>,
+    ) -> PendulumSystem {
         PendulumSystem {
             height,
             mass,
@@ -29,7 +36,7 @@ impl PendulumSystem {
             length,
             attractors,
             length_squared: length * length,
-            gravity_over_length: gravity / length
+            gravity_over_length: gravity / length,
         }
     }
 }
@@ -65,4 +72,3 @@ impl DifferentialSystem for PendulumSystem {
         dxdt[3] = x[1] * gravity_value + (-self.drag * x[3] + y_attraction_force) / self.mass;
     }
 }
-
