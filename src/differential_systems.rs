@@ -1,5 +1,5 @@
-pub trait DifferentialSystem {
-    fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64);
+pub trait DifferentialSystem<const D: usize> {
+    fn evaluate(&self, x: &[f64; D], dxdt: &mut [f64; D], t: f64);
 }
 
 pub struct Attractor {
@@ -41,7 +41,7 @@ impl PendulumSystem {
     }
 }
 
-impl DifferentialSystem for PendulumSystem {
+impl DifferentialSystem<4> for PendulumSystem {
     fn evaluate(&self, x: &[f64; 4], dxdt: &mut [f64; 4], t: f64) {
         let _ = t; // system not dependent on t
         let x_squared = x[0] * x[0];

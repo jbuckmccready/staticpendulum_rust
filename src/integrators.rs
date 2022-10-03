@@ -4,8 +4,8 @@ use itertools::izip;
 
 use crate::differential_systems::DifferentialSystem;
 
-pub trait Integrator<T: DifferentialSystem> {
-    fn do_step(&self, system: &T, x: &mut [f64; 4], t: &mut f64, h: &mut f64) -> i32;
+pub trait Integrator<T: DifferentialSystem<D>, const D: usize> {
+    fn do_step(&self, system: &T, x: &mut [f64; D], t: &mut f64, h: &mut f64) -> i32;
 }
 
 pub struct CashKarp54 {
@@ -14,8 +14,8 @@ pub struct CashKarp54 {
     pub max_step_size: f64,
 }
 
-impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
-    fn do_step(&self, system: &T, x: &mut [f64; 4], t: &mut f64, h: &mut f64) -> i32 {
+impl<T: DifferentialSystem<D>, const D: usize> Integrator<T, D> for CashKarp54 {
+    fn do_step(&self, system: &T, x: &mut [f64; D], t: &mut f64, h: &mut f64) -> i32 {
         const C2: f64 = 1.0 / 5.0;
         const C3: f64 = 3.0 / 10.0;
         const C4: f64 = 3.0 / 5.0;
@@ -59,19 +59,19 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         const A64: f64 = 44275.0 / 110_592.0;
         const A65: f64 = 253.0 / 4096.0;
 
-        let mut temp_state = [0.0; 4];
+        let mut temp_state = [0.0; D];
 
-        let mut k1 = [0.0; 4];
+        let mut k1 = [0.0; D];
         system.evaluate(x, &mut k1, *t); // fill k1
 
         izip!((*x).iter(), k1.iter(), &mut temp_state)
             .for_each(|(xi, k1i, ts)| *ts = xi + *h * A21 * k1i);
-        let mut k2 = [0.0; 4];
+        let mut k2 = [0.0; D];
         system.evaluate(&temp_state, &mut k2, *t + C2 * *h); // fill k2
 
         izip!((*x).iter(), k1.iter(), k2.iter(), &mut temp_state)
             .for_each(|(xi, k1i, k2i, ts)| *ts = xi + *h * (A31 * k1i + A32 * k2i));
-        let mut k3 = [0.0; 4];
+        let mut k3 = [0.0; D];
         system.evaluate(&temp_state, &mut k3, *t + C3 * *h); // fill k3
 
         izip!(
@@ -82,7 +82,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
             &mut temp_state
         )
         .for_each(|(xi, k1i, k2i, k3i, ts)| *ts = xi + *h * (A41 * k1i + A42 * k2i + A43 * k3i));
-        let mut k4 = [0.0; 4];
+        let mut k4 = [0.0; D];
         system.evaluate(&temp_state, &mut k4, *t + C4 * *h); // fill k4
 
         izip!(
@@ -96,7 +96,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         .for_each(|(xi, k1i, k2i, k3i, k4i, ts)| {
             *ts = xi + *h * (A51 * k1i + A52 * k2i + A53 * k3i + A54 * k4i)
         });
-        let mut k5 = [0.0; 4];
+        let mut k5 = [0.0; D];
         system.evaluate(&temp_state, &mut k5, *t + C5 * *h); // fill k5
 
         izip!(
@@ -111,7 +111,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
         .for_each(|(xi, k1i, k2i, k3i, k4i, k5i, ts)| {
             *ts = xi + *h * (A61 * k1i + A62 * k2i + A63 * k3i + A64 * k4i + A65 * k5i)
         });
-        let mut k6 = [0.0; 4];
+        let mut k6 = [0.0; D];
         system.evaluate(&temp_state, &mut k6, *t + C6 * *h); // fill k6
 
         let mut order5_solution = [0.0; 4];
@@ -148,7 +148,7 @@ impl<T: DifferentialSystem> Integrator<T> for CashKarp54 {
                     + BDIFF6 * k6i)
         });
 
-        let mut potential_solution = [0.0; 4];
+        let mut potential_solution = [0.0; D];
         izip!((*x).iter(), order5_solution.iter(), &mut potential_solution)
             .for_each(|(xi, o5s, ps)| *ps = xi + o5s);
 

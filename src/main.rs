@@ -14,7 +14,7 @@ pub struct IntegrationResult {
 }
 
 #[inline]
-fn integrate_point<T: Integrator<PendulumSystem>>(
+fn integrate_point<T: Integrator<PendulumSystem, 4>>(
     integrator: &T,
     pendulum_system: &PendulumSystem,
     point: &mut [f64; 4],
